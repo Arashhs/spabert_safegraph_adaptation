@@ -12,9 +12,9 @@ from dataset_loader import SpatialDataset
 
 import pdb
 
-class PbfMapDataset(SpatialDataset):
+class SGDataset(SpatialDataset):
     def __init__(self, data_file_path,  tokenizer=None, max_token_len = 512, distance_norm_factor = 0.0001, spatial_dist_fill=10, 
-        with_type = True, sep_between_neighbors = False, label_encoder = None, mode = None, num_neighbor_limit = None, random_remove_neighbor = 0.,type_key_str='class'):
+        with_type = False, sep_between_neighbors = False, label_encoder = None, mode = None, num_neighbor_limit = None, random_remove_neighbor = 0.,type_key_str='class'):
         
         if tokenizer is None:
             self.tokenizer = BertTokenizer.from_pretrained('bert-base-uncased')
@@ -31,7 +31,7 @@ class PbfMapDataset(SpatialDataset):
         self.random_remove_neighbor = random_remove_neighbor
         self.type_key_str  = type_key_str # key name of the class type in the input data dictionary
  
-        super(PbfMapDataset, self).__init__(self.tokenizer , max_token_len , distance_norm_factor, sep_between_neighbors )
+        super(SGDataset, self).__init__(self.tokenizer , max_token_len , distance_norm_factor, sep_between_neighbors )
         
 
     def read_file(self, data_file_path, mode):
@@ -61,6 +61,7 @@ class PbfMapDataset(SpatialDataset):
         # process pivot
         pivot_name = line_data_dict['info']['name']
         pivot_pos = line_data_dict['info']['geometry']['coordinates']
+        pivot_id = line_data_dict['info']['safegraph_place_id']
 
         
         neighbor_info = line_data_dict['neighbor_info']
@@ -97,6 +98,9 @@ class PbfMapDataset(SpatialDataset):
         if 'ogc_fid' in line_data_dict['info']:
             train_data['ogc_fid'] = line_data_dict['info']['ogc_fid']
 
+        # add pivot_id and pivot_pos to train_data
+        train_data['pivot_id'] = pivot_id
+        train_data['pivot_pos'] = pivot_pos
         return train_data
 
     def __len__(self):

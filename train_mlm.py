@@ -40,14 +40,14 @@ def training(args):
 
     assert bert_option in ['bert-base','bert-large']
 
-    london_file_path = '../data/sql_output/osm-point-london.json'
-    california_file_path = '../data/sql_output/osm-point-california.json'
+    london_file_path = './data/osm-point-london.json'
+    california_file_path = './data/osm-point-california.json'
 
     if args.model_save_dir is None:
         sep_pathstr = '_sep' if sep_between_neighbors else '_nosep' 
         freeze_pathstr = '_freeze' if freeze_backbone else '_nofreeze'
         context_pathstr = '_nocontext' if if_no_spatial_distance else '_withcontext'
-        model_save_dir = '/data2/zekun/spatial_bert_weights/mlm_mem_lr' + str("{:.0e}".format(lr)) + sep_pathstr + context_pathstr +'/'+bert_option+ freeze_pathstr + '_mlm_mem_london_california_bsize' + str(batch_size)
+        model_save_dir = './saved_weights/spatial_bert_weights/mlm_mem_lr' + str("{:.0e}".format(lr)) + sep_pathstr + context_pathstr +'/'+bert_option+ freeze_pathstr + '_mlm_mem_london_california_bsize' + str(batch_size)
 
         if not os.path.isdir(model_save_dir):
             os.makedirs(model_save_dir)
@@ -111,6 +111,7 @@ def training(args):
                                             mode = None)
 
     train_dataset = torch.utils.data.ConcatDataset([london_train_dataset, california_train_dataset])
+    train_dataset.__getitem__(0)
 
 
     if DEBUG:
